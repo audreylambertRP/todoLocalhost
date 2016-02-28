@@ -1,5 +1,9 @@
 import React from 'react'
 
+import TodoList from './components/Todolist'
+import AddTodo from './components/AddTodo'
+import Filtering from './components/Filtering'
+
 export default class App extends React.Component {
   constructor(props) {
     super(props)
@@ -21,14 +25,14 @@ export default class App extends React.Component {
 
   addTodo(e) {
    this.setState({
-     todos: this.state.todos.concat({id: this.idCounter++, text: this.newTodo})
+     todos: this.state.todos.concat({id: this.idCounter++, text: this.newTodo, status: 'todo'})
    })
   }
 
-  deleteTodo(i) {
+  deleteTodo(id) {
     this.setState({
-      todos: this.state.todos.filter(function(elem, index, array) {
-        return i !== index
+      todos: this.state.todos.filter(function(todo) {
+        return id !== todo.id
       })
     })
   }
@@ -59,33 +63,20 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <h1>My new todo</h1>
+        <h1>My brand new todo</h1>
 
-        <div id='addTodo'>
-          <input type="text" onChange={this.updateNewTodo.bind(this)} />
-          <input type='submit' value='Add todo' onClick={this.addTodo.bind(this)}/>
-        </div>
+        <AddTodo
+          updateNewTodo={this.updateNewTodo.bind(this)}
+          addTodo={this.addTodo.bind(this)} />
 
-        <div id ='todoList'>
-          {
-            this.state.todos.filter((todo) => {
-              return this.state.filter === 'all' || this.state.filter === todo.status
-            })
-            .map(function(todo, index) {
-              return <div key={todo.id}>
-                        <li>{index + 1} : {todo.text}</li>
-                        <button type='button' onClick={this.deleteTodo.bind(this, index)}>Delete todo</button>
-                        <button type='button' onClick={this.changeTodoStatus.bind(this, todo.id)}>Is it done?</button>
-                     </div>
-            }.bind(this))
-          }
-        </div>
+        <TodoList
+          todos={this.state.todos}
+          filter={this.state.filter}
+          deleteTodo={this.deleteTodo.bind(this)}
+          changeTodoStatus={this.changeTodoStatus.bind(this)} />
 
-        <div id='filtering'>
-          <button type='button' onClick={this.changeFilter('all')}>Display all</button>
-          <button type='button' onClick={this.changeFilter('todo')}>Display only todos</button>
-          <button type='button' onClick={this.changeFilter('done')}>Delete only done</button>
-        </div>
+        <Filtering
+          changeFilter={this.changeFilter.bind(this)} />
       </div>
     );
   }
